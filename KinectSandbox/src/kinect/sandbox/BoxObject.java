@@ -45,21 +45,4 @@ public class BoxObject extends SceneObject {
 		// set position
 		setPosition(_position);
 	}
-	
-	private void activatePhysics() {
-		if (mPhysicsController.getMass() != 0.0f)
-		{
-			//mPhysicsController.setDamping(0.75f, 0f);
-			mPhysicsController.setFriction(1f);
-			mPhysicsController.setRestitution(0.0f);
-			mPhysicsController.setSleepingThresholds(1f, 1f);
-			
-			mPhysicsController.activate();
-		}
-	}
-	
-	public void setPosition(Vector3f _position) {
-		mPhysicsController.setPhysicsLocation(_position);
-	}
-	
 }

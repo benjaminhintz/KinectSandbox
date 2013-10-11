@@ -41,7 +41,9 @@ public class KinectSandbox extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
-       
+       if (mScene != null) {
+		   mScene.update(tpf);
+	   }
     }
 
     @Override

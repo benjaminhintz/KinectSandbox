@@ -8,21 +8,19 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
-import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.renderer.ViewPort;
-import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.shadow.EdgeFilteringMode;
-import com.jme3.shadow.SpotLightShadowFilter;
-import com.jme3.shadow.SpotLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 import java.util.ArrayList;
@@ -42,10 +40,15 @@ public class Scene {
 	public static final float		BOX_MASS = 1.0f; 
 	public static final int			BOX_COUNT = 30; 
 	
+	public static final float		CONTROLLER_SIZE = 0.2f; 
+	public static final float		CONTROLLER_MASS = 1.0f; 
+	
 	// global objects
 	private SimpleApplication		mApplication;
     private BulletAppState			mBulletAppState;
-			
+	private KinectController		mKinectController;
+	private StereoCamera			mCamera;
+	
 	// Scene objects
 	private DirectionalLight		mSunLight;			
 	private List<SceneObject>		mObjects = new ArrayList<SceneObject>();
@@ -62,8 +65,9 @@ public class Scene {
 		
 		// create jBullet Physics
 		mBulletAppState = new BulletAppState();
+		mBulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
 		mApplication.getStateManager().attach(mBulletAppState);
-		//mBulletAppState.getPhysicsSpace().enableDebug(mApplication.getAssetManager());
+		mBulletAppState.getPhysicsSpace().enableDebug(mApplication.getAssetManager());
 				
 		// create Scene
 		create();
@@ -73,12 +77,20 @@ public class Scene {
 		setupScene();
 		createGround();
 		createBoxes();
+		createController();
 	}
 	
 	public void reset() {
 		
 	}
-	 
+	
+	public void update(float _delta) {
+		
+		if (mKinectController != null) {
+			mKinectController.update(_delta);
+		}
+	}
+	
 	private void setupScene() {
 		// get global objects
 		AssetManager assetManager = mApplication.getAssetManager();
@@ -90,7 +102,6 @@ public class Scene {
         al.setColor(ColorRGBA.White.mult(0.3f));
         rootNode.addLight(al);
 		
-		// setup shadow renderer
 		FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
 		
 		// Directional Light
@@ -99,7 +110,7 @@ public class Scene {
 		mSunLight.setDirection(new Vector3f(0.0f, -1.0f, -1.0f).normalizeLocal());
 		mApplication.getRootNode().addLight(mSunLight);
 		
-		/*
+		// setup shadow renderer
 		final int SHADOWMAP_SIZE = 1024;
         DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
         dlsr.setLight(mSunLight);
@@ -116,7 +127,7 @@ public class Scene {
         dlsf.setShadowIntensity(0.6f);
         dlsf.setEdgeFilteringMode(EdgeFilteringMode.Bilinear);
         fpp.addFilter(dlsf);
-        */
+        
 	
 		/* Spot Light
 		SpotLight spot = new SpotLight();
@@ -142,8 +153,13 @@ public class Scene {
 		fpp.addFilter(slsf);
 		*/
 		
-        //viewPort.addProcessor(fpp);
-
+		// glow filter
+		BloomFilter bloom = new BloomFilter(BloomFilter.GlowMode.Objects);
+		bloom.setBloomIntensity(4.0f);
+		bloom.setBlurScale(2.0f);
+		fpp.addFilter(bloom);
+	
+        viewPort.addProcessor(fpp);
 	}
 	
 	private void createGround() {
@@ -184,8 +200,7 @@ public class Scene {
 		Texture diffuseTexture = assetManager.loadTexture("Textures/crate_02.png");
 		material.setTexture("ColorMap", diffuseTexture);
 		*/
-				
-		
+
 		Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture diffuseTexture = assetManager.loadTexture("Textures/crate_02.png");
 		Texture normalTexture = assetManager.loadTexture("Textures/crate_02_n.png");
@@ -214,18 +229,40 @@ public class Scene {
 		}
 	}
 	
+	private void createController() {
+		// get global objects
+		AssetManager assetManager = mApplication.getAssetManager();
+		Node rootNode = mApplication.getRootNode();
+		
+		// create sphere based controller
+		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		material.setColor("Color", new ColorRGBA(0.3f, 0.3f, 1.0f, 0.5f));
+		material.setColor("GlowColor", ColorRGBA.Blue);
+		material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+		
+		SphereObject controller = new SphereObject("Controller", new Vector3f(0.0f, 1.0f, 6.0f), CONTROLLER_SIZE, material, CONTROLLER_MASS);
+		controller.setQueueBucket(Bucket.Transparent); 
+		addToScene(controller);
+		
+		// create camera
+		mCamera = new StereoCamera(mApplication, controller);
+		
+		// create kinect controller
+		mKinectController = new KinectController(mApplication, controller, mCamera);
+	}
+	
 	
 	private void addToScene(SceneObject _object) {
 		mApplication.getRootNode().attachChild(_object);
-		mBulletAppState.getPhysicsSpace().add(_object.getPhyscsController());
+		mBulletAppState.getPhysicsSpace().add(_object.getController());
 		mObjects.add(_object);
 	}
 
 	
-	public int randInt(int min, int max) {
+	public int randInt(int _min, int _max) {
 		// nextInt is normally exclusive of the top value,
 		// so add 1 to make it inclusive
-		return mRandom.nextInt((max - min) + 1) + min;
+		return mRandom.nextInt((_max - _min) + 1) + _min;
 	}
 	
 }

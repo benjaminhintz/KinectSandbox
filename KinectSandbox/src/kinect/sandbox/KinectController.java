@@ -7,12 +7,13 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.PhysicsCollisionEvent;
 import com.jme3.bullet.collision.PhysicsCollisionListener;
-import com.jme3.bullet.joints.PhysicsJoint;
-import com.jme3.bullet.joints.Point2PointJoint;
+import com.jme3.bullet.joints.HingeJoint;
+import com.jme3.bullet.joints.SixDofJoint;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 
 /**
@@ -36,8 +37,8 @@ public class KinectController implements ActionListener, PhysicsCollisionListene
 	private BoxObject				mCurrentControlledObject = null;
 	private Vector3f				mLocalControllerCollisionPoint = null;
 	private Vector3f				mLocalTouchedObjectCollisionPoint = null;
-	private Point2PointJoint		mConnection;
-	
+	//private Point2PointJoint		mConnection;
+	private SixDofJoint				mConnection;
 			
 	// movement flags
 	private boolean					mForward = false;
@@ -71,10 +72,10 @@ public class KinectController implements ActionListener, PhysicsCollisionListene
 		inputManager.addListener(this, "left");
 		inputManager.addMapping("right", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addListener(this, "right");
-		inputManager.addMapping("pickup", new KeyTrigger(KeyInput.KEY_RETURN));
+		inputManager.addMapping("pickup", new KeyTrigger(KeyInput.KEY_SPACE));
 		inputManager.addListener(this, "pickup");
-		inputManager.addMapping("drop", new KeyTrigger(KeyInput.KEY_SPACE));
-		inputManager.addListener(this, "drop");
+		//inputManager.addMapping("drop", new KeyTrigger(KeyInput.KEY_SPACE));
+		//inputManager.addListener(this, "drop");
 	}
 
 	public void onAction(String _name, boolean _isPressed, float _tpf) {
@@ -90,7 +91,7 @@ public class KinectController implements ActionListener, PhysicsCollisionListene
 		if (_name.equals("right")) {
 			mRight = _isPressed;
         }
-		if (_name.equals("pickup")) {
+		if (_name.equals("pickup") && _isPressed) {
 			pickupObject();
         }
 		if (_name.equals("drop")) {
@@ -167,21 +168,30 @@ public class KinectController implements ActionListener, PhysicsCollisionListene
 	
 	
 	private void pickupObject() {
+		if (mCurrentControlledObject != null)
+		{
+			dropObject();
+		}
+		
 		if (mLastTouchedObject == null || mLocalControllerCollisionPoint == null || mLocalTouchedObjectCollisionPoint == null) {
 			return;
 		}
 		
 		dropObject();
 		
-		// create connection joint
-		//Vector3f pivotA = mController.worldToLocal(mLocalControllerCollisionPoint, new Vector3f());
-        //Vector3f pivotB = mLastTouchedObject.worldToLocal(mLocalTouchedObjectCollisionPoint, new Vector3f());
-		
-		mConnection = new Point2PointJoint(mController.getController(), mLastTouchedObject.getController(), mLocalControllerCollisionPoint, mLocalTouchedObjectCollisionPoint);
+		// setup joints between both objects
+		mConnection =  new SixDofJoint(mController.getController(), mLastTouchedObject.getController(), mLocalControllerCollisionPoint, mLocalTouchedObjectCollisionPoint, true);	
+		mConnection.setAngularUpperLimit(new Vector3f(0, 0, 0));
+		mConnection.setAngularLowerLimit(new Vector3f(0, 0, 0));
+		mConnection.setLinearLowerLimit(new Vector3f(0, 0, 0));
+		mConnection.setLinearUpperLimit(new Vector3f(0, 0, 0));
 		mBulletAppState.getPhysicsSpace().add(mConnection);
 		
 		mCurrentControlledObject = mLastTouchedObject;
 		mLastTouchedObject = null;
+		
+		// add glow to the box
+		mCurrentControlledObject.getMaterial().setColor("GlowColor", new ColorRGBA(1f, 0f, 0f, 0.2f));
 		
 		System.out.println("Pickup Object: " + mCurrentControlledObject.getName());
 	}
@@ -199,6 +209,13 @@ public class KinectController implements ActionListener, PhysicsCollisionListene
 			mConnection = null;
 		}
 		
+		// remove glow
+		mCurrentControlledObject.getMaterial().setColor("GlowColor", ColorRGBA.Black);
+		mCurrentControlledObject.getController().activate();
+		
+		mLastTouchedObject = null;
+		mLocalControllerCollisionPoint = null;
+		mLocalTouchedObjectCollisionPoint = null;
 		mCurrentControlledObject = null;
 	}
 	

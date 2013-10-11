@@ -38,20 +38,20 @@ public class SphereObject extends SceneObject {
 		
 		setMesh(sphere);
 		setMaterial(_material);
-		setShadowMode(RenderQueue.ShadowMode.Cast);
+		setShadowMode(RenderQueue.ShadowMode.Off);
 		
 		// create ghost physics controller
 		mGhostControl = new GhostControl(new SphereCollisionShape(_radius));
 		addControl(mGhostControl);
 		
 		// create physics controller
-		mPhysicsController = new RigidBodyControl(1.0f);
+		mPhysicsController = new RigidBodyControl(10.0f);
 		addControl(mPhysicsController);
 		//mPhysicsController.setGravity(new Vector3f(0,0,0));
 		mPhysicsController.setKinematic(true);
-		mPhysicsController.setCollisionShape(new SphereCollisionShape(0.0000000001f));
-		mPhysicsController.setCollideWithGroups(PhysicsCollisionObject.COLLISION_GROUP_02);
-		//mPhysicsController.setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_03);
+		mPhysicsController.setCollisionShape(new SphereCollisionShape(1.0f));
+		mPhysicsController.setCollideWithGroups(PhysicsCollisionObject.COLLISION_GROUP_04);
+		mPhysicsController.setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_04);
 				
 		// set position
 		setPosition(_position);

@@ -33,9 +33,9 @@ abstract class SceneObject extends Geometry {
 	protected void activatePhysics() {
 		if (mPhysicsController != null && mPhysicsController.getMass() != 0.0f)
 		{
-			//mPhysicsController.setDamping(0.75f, 0f);
-			mPhysicsController.setFriction(1f);
-			mPhysicsController.setRestitution(1.0f);
+			//mPhysicsController.setDamping(0.0f, 0.2f);
+			mPhysicsController.setFriction(10.0f);
+			mPhysicsController.setRestitution(0.0f);
 			mPhysicsController.setSleepingThresholds(1f, 1f);
 			
 			mPhysicsController.activate();
@@ -43,7 +43,7 @@ abstract class SceneObject extends Geometry {
 	}
 	
 	public void setPosition(Vector3f _position) {
-		//setLocalTranslation(_position);
+		setLocalTranslation(_position);
 		mPhysicsController.setPhysicsLocation(_position);
 	}
 	

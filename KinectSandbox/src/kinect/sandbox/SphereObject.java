@@ -3,6 +3,7 @@
  */
 package kinect.sandbox;
 
+import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.shapes.SphereCollisionShape;
 import com.jme3.bullet.control.GhostControl;
 import com.jme3.bullet.control.PhysicsControl;
@@ -22,7 +23,7 @@ public class SphereObject extends SceneObject {
 	private GhostControl	mGhostControl = null;
 	
 	// Properties
-	public PhysicsControl getController() {
+	public PhysicsControl getGhostController() {
 		return mGhostControl;
 	}
 	
@@ -39,21 +40,32 @@ public class SphereObject extends SceneObject {
 		setMaterial(_material);
 		setShadowMode(RenderQueue.ShadowMode.Cast);
 		
-		// create physics controller
+		// create ghost physics controller
 		mGhostControl = new GhostControl(new SphereCollisionShape(_radius));
 		addControl(mGhostControl);
 		
+		// create physics controller
+		mPhysicsController = new RigidBodyControl(1.0f);
+		addControl(mPhysicsController);
+		//mPhysicsController.setGravity(new Vector3f(0,0,0));
+		mPhysicsController.setKinematic(true);
+		mPhysicsController.setCollisionShape(new SphereCollisionShape(0.0000000001f));
+		mPhysicsController.setCollideWithGroups(PhysicsCollisionObject.COLLISION_GROUP_02);
+		//mPhysicsController.setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_03);
+				
 		// set position
 		setPosition(_position);
 	}
 	
 	public void setPosition(Vector3f _position) {
 		setLocalTranslation(_position);
-		mGhostControl.setPhysicsLocation(_position);
+		//mGhostControl.setPhysicsLocation(_position);
+		mPhysicsController.setPhysicsLocation(_position);
 	}
 	
 	public Vector3f getPosition() {
-		return mGhostControl.getPhysicsLocation();
+		return getLocalTranslation();
+		//return mGhostControl.getPhysicsLocation();
 	}
 
 	

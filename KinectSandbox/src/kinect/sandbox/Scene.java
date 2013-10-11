@@ -40,8 +40,8 @@ public class Scene {
 	public static final float		BOX_MASS = 1.0f; 
 	public static final int			BOX_COUNT = 30; 
 	
-	public static final float		CONTROLLER_SIZE = 0.2f; 
-	public static final float		CONTROLLER_MASS = 1.0f; 
+	public static final float		CONTROLLER_SIZE = 0.4f; 
+	public static final float		CONTROLLER_MASS = 0.0f; 
 	
 	// global objects
 	private SimpleApplication		mApplication;
@@ -240,15 +240,22 @@ public class Scene {
 		material.setColor("GlowColor", ColorRGBA.Blue);
 		material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 		
+		/*
+		BoxObject controller = new BoxObject("Controller", new Vector3f(0, 1.0f, 0), new Vector3f(BOX_SIZE, BOX_SIZE, BOX_SIZE), material, 0.0f, null);
+		addToScene(controller);
+		*/
+				
 		SphereObject controller = new SphereObject("Controller", new Vector3f(0.0f, 1.0f, 6.0f), CONTROLLER_SIZE, material, CONTROLLER_MASS);
 		controller.setQueueBucket(Bucket.Transparent); 
 		addToScene(controller);
-		
+		mBulletAppState.getPhysicsSpace().add(controller.getGhostController());
+				
 		// create camera
 		mCamera = new StereoCamera(mApplication, controller);
 		
 		// create kinect controller
-		mKinectController = new KinectController(mApplication, controller, mCamera);
+		mKinectController = new KinectController(mApplication, mBulletAppState, controller, mCamera);
+		mBulletAppState.getPhysicsSpace().addCollisionListener(mKinectController);
 	}
 	
 	

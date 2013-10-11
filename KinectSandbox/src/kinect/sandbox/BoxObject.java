@@ -38,6 +38,7 @@ public class BoxObject extends SceneObject {
 		// create physics controller
 		mPhysicsController = new RigidBodyControl(_mass);
 		addControl(mPhysicsController);
+		//mPhysicsController.setKinematic(false);
 		
 		// setup physics
 		activatePhysics();

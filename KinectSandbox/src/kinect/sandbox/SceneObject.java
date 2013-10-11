@@ -18,7 +18,7 @@ abstract class SceneObject extends Geometry {
 	protected RigidBodyControl		mPhysicsController = null;
 	
 	// Properties
-	public PhysicsControl getController() {
+	public RigidBodyControl getController() {
 		return mPhysicsController;
 	}
 	
@@ -43,7 +43,7 @@ abstract class SceneObject extends Geometry {
 	}
 	
 	public void setPosition(Vector3f _position) {
-		setLocalTranslation(_position);
+		//setLocalTranslation(_position);
 		mPhysicsController.setPhysicsLocation(_position);
 	}
 	
@@ -53,10 +53,10 @@ abstract class SceneObject extends Geometry {
 	
 	public void addPosition(Vector3f _position) {
 		Vector3f curentPosition = getPosition();
-		System.out.println("Current Pos: " + curentPosition);
+		//System.out.println("Current Pos: " + curentPosition);
 		
 		Vector3f newPosition = curentPosition.add(_position);
-		System.out.println("New Pos: " + newPosition);
+		//System.out.println("New Pos: " + newPosition);
 		
 		setPosition(newPosition);		
 	}

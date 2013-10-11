@@ -19,7 +19,7 @@ public class StereoCamera {
 	
 	// private objects
 	private ChaseCamera				mCamera;
-	private SphereObject			mTarget;
+	private SceneObject				mTarget;
 	
 	
 	// properties
@@ -34,7 +34,7 @@ public class StereoCamera {
 	/**
 	 * Constructor
 	 */		
-	public StereoCamera(SimpleApplication _application, SphereObject _target) {
+	public StereoCamera(SimpleApplication _application, SceneObject _target) {
 		mApplication = _application;
 		mTarget = _target;
 		

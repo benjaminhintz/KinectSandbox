@@ -21,7 +21,8 @@ public class KinectSandbox extends SimpleApplication {
      */
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
-        settings.setResolution(1000, 800);
+        settings.setResolution(1280, 768);
+		//settings.setResolution(1000, 800);
         settings.setBitsPerPixel(32);
         settings.setFullscreen(false);
 

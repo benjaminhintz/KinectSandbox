@@ -6,6 +6,7 @@ package kinect.sandbox;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 
 /**
@@ -52,6 +53,9 @@ public class StereoCamera {
 		chaseCam.setSmoothMotion(false);
 		chaseCam.setTrailingEnabled(false);
 		chaseCam.setInvertVerticalAxis(true);
+		chaseCam.setDefaultHorizontalRotation(FastMath.DEG_TO_RAD * 90.0f);
+		chaseCam.setMaxDistance(50.0f);
+		chaseCam.setDefaultDistance(50.0f);
 	}
 	
 	

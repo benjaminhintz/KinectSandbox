@@ -3,8 +3,8 @@
  */
 package kinect.sandbox;
 
-import com.jme3.bullet.control.PhysicsControl;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 
@@ -33,11 +33,10 @@ abstract class SceneObject extends Geometry {
 	protected void activatePhysics() {
 		if (mPhysicsController != null && mPhysicsController.getMass() != 0.0f)
 		{
-			//mPhysicsController.setDamping(0.0f, 0.2f);
-			mPhysicsController.setFriction(10.0f);
+			mPhysicsController.setDamping(0.0f, 0.3f);
+			mPhysicsController.setFriction(30.0f);
 			mPhysicsController.setRestitution(0.0f);
 			mPhysicsController.setSleepingThresholds(1f, 1f);
-			
 			mPhysicsController.activate();
 		}
 	}
@@ -47,8 +46,17 @@ abstract class SceneObject extends Geometry {
 		mPhysicsController.setPhysicsLocation(_position);
 	}
 	
+	public void setRotation(Quaternion _rotation) {
+		setLocalRotation(_rotation);
+		mPhysicsController.setPhysicsRotation(_rotation);
+	}
+	
 	public Vector3f getPosition() {
 		return mPhysicsController.getPhysicsLocation();
+	}
+	
+	public Quaternion getRotation() {
+		return mPhysicsController.getPhysicsRotation();
 	}
 	
 	public void addPosition(Vector3f _position) {
@@ -60,4 +68,6 @@ abstract class SceneObject extends Geometry {
 		
 		setPosition(newPosition);		
 	}
+	
+	
 }

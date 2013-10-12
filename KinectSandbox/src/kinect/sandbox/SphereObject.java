@@ -57,6 +57,7 @@ public class SphereObject extends SceneObject {
 		setPosition(_position);
 	}
 	
+	/*
 	public void setPosition(Vector3f _position) {
 		setLocalTranslation(_position);
 		//mGhostControl.setPhysicsLocation(_position);
@@ -67,6 +68,6 @@ public class SphereObject extends SceneObject {
 		return getLocalTranslation();
 		//return mGhostControl.getPhysicsLocation();
 	}
-
+	*/
 	
 }

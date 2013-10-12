@@ -40,14 +40,17 @@ public class Scene  implements ActionListener {
 	
 	// constants
 	public static final float		GROUND_SIZE = 40.0f; 
-	
+
 	public static final float		BOX_SIZE_MIN = 0.4f; 
 	public static final float		BOX_SIZE_MAX = 1.0f; 
-	public static final float		BOX_MASS = 2.0f; 
-	public static final int			BOX_COUNT = 30; 
+	public static final float		BOX_MASS = 4.0f; 
+	public static final int			BOX_COUNT = 20; 
+	public static final float		BOX_SPAWN_HEIGHT = 8.0f; 
 	
 	public static final float		CONTROLLER_SIZE = 1.4f; 
 	public static final float		CONTROLLER_MASS = 0.0f; 
+	public static final float		CONTROLLER_MIN_HEIGHT = 1.6f; 
+	public static final float		CONTROLLER_MAX_HEIGHT = 100.0f; 
 	
 	// global objects
 	private SimpleApplication		mApplication;
@@ -95,7 +98,7 @@ public class Scene  implements ActionListener {
 			int x = randInt(minGroundSize, maxGroundSize);
 			int z = randInt(minGroundSize, maxGroundSize);
 			
-			object.setPosition(new Vector3f(x, 3.0f, z));
+			object.setPosition(new Vector3f(x, BOX_SPAWN_HEIGHT, z));
 			object.getController().activate();
 		}
 	}
@@ -216,15 +219,14 @@ public class Scene  implements ActionListener {
 		material.setColor("Specular",ColorRGBA.White);
 		material.setFloat("Shininess", 64f);  // [0,128]
 		
-		BoxObject ground = new BoxObject("Ground", new Vector3f(0.0f, -4.0f, 0.0f), new Vector3f(GROUND_SIZE, 0.1f, GROUND_SIZE), material, 0.0f, new Vector2f(4.0f, 4.0f));
-		addToScene(ground);		
+		BoxObject ground = new BoxObject("Ground", new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(GROUND_SIZE, 0.1f, GROUND_SIZE), material, 0.0f, new Vector2f(4.0f, 4.0f));
+		addToScene(ground);
 	}
 	
 	
 	private void createBoxes() {
 		// get global objects
 		AssetManager assetManager = mApplication.getAssetManager();
-		Node rootNode = mApplication.getRootNode();
 		
 		// create ground & add to scene
 		/*
@@ -273,7 +275,7 @@ public class Scene  implements ActionListener {
 			int z = randInt(minGroundSize, maxGroundSize);
 			float size = randFloat(BOX_SIZE_MIN, BOX_SIZE_MAX);
 			
-			BoxObject ground = new BoxObject("box_" + i, new Vector3f(x, 1.0f, z), new Vector3f(size, size, size), material, BOX_MASS * size, null);
+			BoxObject ground = new BoxObject("box_" + i, new Vector3f(x, BOX_SPAWN_HEIGHT, z), new Vector3f(size, size, size), material, BOX_MASS * size, null);
 			addToScene(ground);		
 		}
 	}
@@ -281,7 +283,6 @@ public class Scene  implements ActionListener {
 	private void createController() {
 		// get global objects
 		AssetManager assetManager = mApplication.getAssetManager();
-		Node rootNode = mApplication.getRootNode();
 		
 		// create sphere based controller
 		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

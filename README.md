@@ -16,3 +16,8 @@ Installation
 7. "handdriver.bat" im Verzeichnis des "Finger Precise Tracking" ausführen (WICHTIG: Erst nachdem die Kamera Kalibierung erfolgreich war!)
 8. KinectSandbox Projekt ausführen.
 9. Glücklich sein!
+
+Demonstration
+-------------
+
+[Youtube Video] (http://youtu.be/fuqHmnVgcR4)
